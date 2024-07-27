@@ -24,6 +24,11 @@ public:
 	// ASC에 Ability를 추가하기 위한 코드
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 
+	// 태그를 통해 키 입력 유지시 입력됨을 알리고, 활성화되지 않은 경우 활성화
+	void AbilityInputTagHeld(const FGameplayTag& InputTag);
+	// 태그를 통해 키 입력 종료시 종료됨을 알림
+	void AbilityInputTagReleased(const FGameplayTag& InputTag);
+
 protected:
 	void EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle);
 };
