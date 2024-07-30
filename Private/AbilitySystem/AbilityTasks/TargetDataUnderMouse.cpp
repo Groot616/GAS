@@ -21,14 +21,26 @@ void UTargetDataUnderMouse::Activate()
 	// 
 	const bool bIsLocallyControlled = Ability->GetCurrentActorInfo()->IsLocallyControlled();
 
+	// 컨트롤러를 클라이언트가 제어하는 경우
 	if (bIsLocallyControlled)
 	{
 		// 클라이언트 측에서 서버로 커서 로케이션 데이터 전송
 		SendMouseCursorData();
 	}
+	// 컨트롤러를 서버가 제어하는 경우
 	else
 	{
-		// TODO: 컨트롤러가 서버측에 의해 제어되고 있으므로 TargetData를 listen 해야함
+		// 컨트롤러가 서버측에 의해 제어되고 있으므로 TargetData를 listen 해야함
+		// Activate와 TargetData가 있다면 델리게이트를 진행
+		const FGameplayAbilitySpecHandle SpecHandle = GetAbilitySpecHandle();
+		const FPredictionKey ActivationPredictionKey = GetActivationPredictionKey();
+		AbilitySystemComponent.Get()->AbilityTargetDataSetDelegate(SpecHandle, GetActivationPredictionKey()).AddUObject(this, &UTargetDataUnderMouse::OnTargetDataReplicatedCallback);
+		// 델리게이트를 요청하지 않았다면 아직 Activate 또는 TargetData가 서버에 도달하지 않았다는 의미이므로 대기
+		const bool bCalledDelegated = AbilitySystemComponent.Get()->CallReplicatedTargetDataDelegatesIfSet(SpecHandle, ActivationPredictionKey);
+		if (!bCalledDelegated)
+		{
+			SetWaitingOnRemotePlayerData();
+		}
 	}
 }
 
@@ -71,6 +83,17 @@ void UTargetDataUnderMouse::SendMouseCursorData()
 		AbilitySystemComponent->ScopedPredictionKey);
 
 	// Ability가 활성화되지 않은 상태에서 Broadcast를 방지하기 위함
+	if (ShouldBroadcastAbilityTaskDelegates())
+	{
+		ValidData.Broadcast(DataHandle);
+	}
+}
+
+void UTargetDataUnderMouse::OnTargetDataReplicatedCallback(const FGameplayAbilityTargetDataHandle& DataHandle, FGameplayTag ActivationTag)
+{
+	// ConsumeClientReplicatedTargetData : 클라이언트가 서버로부터 수신한 타겟 데이터를 처리하여 해당 능력을 실행하거나 업데이트함
+	// 클라이언트 측에서 서버로부터 받은 데이터를 바탕으로 적절한 게임플레이 로직을 실행함
+	AbilitySystemComponent->ConsumeClientReplicatedTargetData(GetAbilitySpecHandle(), GetActivationPredictionKey());
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
 		ValidData.Broadcast(DataHandle);

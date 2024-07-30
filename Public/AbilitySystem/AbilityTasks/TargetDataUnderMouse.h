@@ -37,4 +37,7 @@ private:
 	// 델리게이트를 통해 Data를 Broadcast함
 	virtual void Activate() override;
 	void SendMouseCursorData();
+
+	// 콜백함수, Activate와 TargetData 둘다 서버에서 만족할 경우 실행될 콜백 함수(DataHandle Broadcast하기 위한 함수)
+	void OnTargetDataReplicatedCallback(const FGameplayAbilityTargetDataHandle& DataHandle, FGameplayTag ActivationTag);
 };

@@ -76,8 +76,8 @@ public:
 	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
 
 	/*
-	* Primary Attributes
-	*/
+	 * Primary Attributes
+	 */
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Strength, Category = "Primary Attributes")
 	FGameplayAttributeData Strength;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Strength);
@@ -95,8 +95,8 @@ public:
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Vigor);
 
 	/*
-	* Secondary Attributes
-	*/
+	 * Secondary Attributes
+	 */
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Armor, Category = "Secondary Attributes")
 	FGameplayAttributeData Armor;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Armor);
@@ -148,6 +148,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category = "Vital Attributes")
 	FGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Mana);
+
+	/*
+	 * Meta Attributes
+	 */
+	// Meta Attribute는 리플리케이트x
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, IncomingDamage);
 
 	// REPNOTIFY를 위한 UFUNCTION 매크로 사용
 	// 해당 함수가 인자를 전달받으면 해당 인자는 리플리케이트 변수 타입이 됨

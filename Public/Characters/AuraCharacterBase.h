@@ -23,6 +23,15 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
+
+	virtual void Die() override;
+
+	// MulticastRPC 함수
+	// NetMulticast: 서버가 모든 클라이언트에게 함수를 호출하도록 함, Reilable: 함수 호출이 반드시 목적지에 도달호도록 보장
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MulticastHandleDeath();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -55,7 +64,8 @@ protected:
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
-	void InitializeDefaultAttributes() const;
+	// DefaultAttribute 초기화 함수
+	virtual void InitializeDefaultAttributes() const;
 
 	// 캐릭터가 Ability 사용 가능하도록 하는 함수
 	void AddCharacterAbilities();
@@ -65,4 +75,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 	
+	UPROPERTY(EditAnywhere, Category  = "Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 };

@@ -4,13 +4,16 @@
 #include "AbilitySystem/Abilities/AuraProjectileSpell.h"
 #include "Actor/AuraProjectile.h"
 #include "Interaction/CombatInterface.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "Aura/Public/AuraGameplayTags.h"
 
 void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UAuraProjectileSpell::SpawnProjectile()
+void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation)
 {
 	// 서버에 스폰 가능한지 확인
 	// HasAuthority() : 객체가 서버에서 실행중이거나 싱글 플레이어 게임에서 실행중일 경우 true, 객체가 클라이언트에서 실행 중일 경우 false
@@ -25,10 +28,14 @@ void UAuraProjectileSpell::SpawnProjectile()
 	if (CombatInterface)
 	{
 		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
+		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+		// 지면으로부터 평행하게 이동하기 위함
+		Rotation.Pitch = 0.f;
 
 		// 스폰 Transform을 저장할 구조체
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(SocketLocation);
+		SpawnTransform.SetRotation(Rotation.Quaternion());
 		// SpawnActorDeferred<AActorClass>(ActorClass, Transform, Owner, Instigator, SpawnParameters) : 액터를 생성할 때 사용되는 함수. 즉시 액터를 활성화하지 않고 필요한 설정을 완료한 후에 액터를 활성화할 수 있도록 함
 		// ProjectileClass : 생성할 ActorClass
 		// SpawnTransform : 생성 Transform 정보
@@ -42,6 +49,16 @@ void UAuraProjectileSpell::SpawnProjectile()
 		 * DonSpawnIfColliding : 충돌할 경우 액터를 생성하지 않음
 		 */
 		AAuraProjectile* Projectile = GetWorld()->SpawnActorDeferred<AAuraProjectile>(ProjectileClass, SpawnTransform, GetOwningActorFromActorInfo(), Cast<APawn>(GetOwningActorFromActorInfo()), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		
+		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
+		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+		
+		const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
+		const float ScaledDamage = Damage.GetValueAtLevel(10);
+
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
+		Projectile->DamageEffectSpecHandle = SpecHandle;
+
 		Projectile->FinishSpawning(SpawnTransform);
 	}
 }

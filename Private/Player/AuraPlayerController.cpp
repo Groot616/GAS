@@ -61,6 +61,8 @@ void AAuraPlayerController::SetupInputComponent()
 	UAuraInputComponent* AuraInputComponent = CastChecked<UAuraInputComponent>(InputComponent);
 	// CustomInputComponent인 AuraInputComponent 사용
 	AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+	AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AAuraPlayerController::ShiftPressed);
+	AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AAuraPlayerController::ShiftReleased);
 	AuraInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 
 }
@@ -119,14 +121,18 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		return;
 	}
 
-	// 타게팅 중인 경우 해당 태그에 맞는 Ability가 발동되도록 AbilityInputTagHeld(InputTag) 실행
-	// ex) LMB로 공격 Abiliity 사용시
-	if (bTargeting)
-	{
-		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
-	}
-	// 타케팅중이 아닐 경우
-	else
+	/* 이동중일 경우 bTargeting일 필요가 없음
+	//// 타게팅 중인 경우 해당 태그에 맞는 Ability가 발동되도록 AbilityInputTagHeld(InputTag) 실행
+	//// ex) LMB로 공격 Abiliity 사용시
+	//if (bTargeting)
+	//{
+	//	if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
+	//}
+	*/
+	if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
+
+	// 타케팅중이 아닐 경우, shift키 다운이 아닐 경우(공격시도)
+	if(!bTargeting && !bShiftKeyDown)
 	{
 		APawn* ControlledPawn = GetPawn();
 		// 클릭시 AbilityInputTagHeld()가 무조건 먼저 실행되므로 FollowTime 값에 변동 발생
@@ -166,9 +172,8 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 
-	// 타게팅 중인 경우 해당 태그에 맞는 Ability가 발동되도록 AbilityInputTagHeld(InputTag) 실행
-	// ex) LMB로 공격 Abiliity 사용시
-	if (bTargeting)
+	// 타게팅중이거나 shift키 입력중일때 공격 가능하도록 함
+	if (bTargeting || bShiftKeyDown)
 	{
 		if (GetASC())
 		{

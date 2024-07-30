@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AuraGameplayTags.h"
+#include "Interaction/CombatInterface.h"
 
 UAuraAttributeSet::UAuraAttributeSet()
 {
@@ -73,13 +74,11 @@ void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 	if (Attribute == GetHealthAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
-		UE_LOG(LogTemp, Warning, TEXT("Health: %f"), NewValue);
 	}
 
 	if (Attribute == GetManaAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
-		UE_LOG(LogTemp, Warning, TEXT("Mana: %f"), NewValue);
 	}
 }
 
@@ -93,11 +92,45 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+		UE_LOG(LogTemp, Warning, TEXT("Changed Health on %s, Health: %f"), *Props.TargetAvatarActor->GetName(), GetHealth());
 	}
 
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+	}
+
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		// 함수 내의 변수에 IncomingDamage를 할당하였으므로 기존의 IncomingDamage는 0으로 초기화 진행
+		const float LocalIncomingDamage = GetIncomingDamage();
+		SetIncomingDamage(0.f);
+		// 데미지가 0 초과일 경우 체력 감소 효과 발생
+		if (LocalIncomingDamage > 0.f)
+		{
+			const float NewHealth = GetHealth() - LocalIncomingDamage;
+			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+			// 사망 판정용 bool타입 변수
+			const bool bFatal = NewHealth <= 0.f;
+			if (bFatal)
+			{
+				ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor);
+				if (CombatInterface)
+				{
+					// 실제로는 인터페이스의 Die() 가 아닌 각 클래스의 구현부에 있는 Die() 호출됨(폴리모르피즘)
+					CombatInterface->Die();
+				}
+			}
+			else
+			{
+				// TargetContainer를 생성하고, FAuraGameplayTags에서 Effects_HitReact를 가져와 컨테이너에 할당
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FAuraGameplayTags::Get().Effects_HitReact);
+				// 적용 대상의 ASC에서 해당 태그를 보유중일 경우 Ability Activate
+				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
+		}
 	}
 }
 

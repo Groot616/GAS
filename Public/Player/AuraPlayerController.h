@@ -41,6 +41,13 @@ private:
 	// FInputActionValue 사용을 위한 전방선언 필요
 	void Move(const FInputActionValue& InputActionValue);
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> ShiftAction;
+
+	bool bShiftKeyDown = false;
+	void ShiftPressed() { bShiftKeyDown = true; };
+	void ShiftReleased() { bShiftKeyDown = false; };
+	
 	void CursorTrace();
 	/**
 	* 기존 포인터 방식이 아닌 TObjectPtr와 유사한 새로운 방식, 캐스팅 필요x
