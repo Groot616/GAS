@@ -70,6 +70,24 @@ protected:
 	// 캐릭터가 Ability 사용 가능하도록 하는 함수
 	void AddCharacterAbilities();
 
+	/* Dissolve Effects */
+	void Dissolve();
+
+	// UMaterialInstanceDynamic : 런타임동안 동적으로 material 변경하도록 해줌
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartWeaponDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
+
+	// 캐릭터 Mesh Dissolve용
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
+
+	// 캐릭터 무기 Dissolve용
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+
 private:
 	// Ability 클래스 배열
 	UPROPERTY(EditAnywhere, Category = "Abilities")
