@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Groot
 
 #pragma once
 
@@ -21,7 +21,7 @@ public:
 
 	FEffectAssetTags EffectAssetTags;
 
-	// ASC에 Ability를 추가하기 위한 코드
+	// ASC에 Ability를 추가하기 위한 함수
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 
 	// 태그를 통해 키 입력 유지시 입력됨을 알리고, 활성화되지 않은 경우 활성화
@@ -30,5 +30,6 @@ public:
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 
 protected:
-	void EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle);
+	UFUNCTION(Client, Reliable)
+	void ClientEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 };

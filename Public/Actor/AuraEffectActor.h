@@ -1,4 +1,4 @@
-  // Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Groot
 
 #pragma once
 
@@ -8,9 +8,8 @@
 #include "AuraEffectActor.generated.h"
 
 class UGameplayEffect;
-class UAbilitySystemComponent;
 
-// GameplayEffect 적용 Policy
+// 적용 시점 지정
 UENUM(BlueprintType)
 enum class EEffectApplicationPolicy
 {
@@ -20,7 +19,7 @@ enum class EEffectApplicationPolicy
 	// 오버랩 종료시 GameplayEffect 적용
 	ApplyOnEndOverlap,
 
-	// GameplayEffect 미적용
+	// GameplayEffet 미적용
 	DoNotApply
 };
 
@@ -39,8 +38,8 @@ UCLASS()
 class AURA_API AAuraEffectActor : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AAuraEffectActor();
 
@@ -48,11 +47,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// Effect를 Target에게 적용시키는 함수
+	// 파라미터로 타겟과 GameplayEffect를 받음으로써 해당 타겟에게 변화를 적용시킬 예정
 	UFUNCTION(BlueprintCallable)
-	void ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect>GameplayEffectClass);
+	void ApplyEffectToTarget(AActor* Target, TSubclassOf<UGameplayEffect> GameplayEffectClass);
 
-	// 오버랩시 GameplayEffect Policy에 따라 GameplayEffect 적용
+	// 오버랩시 GameplayEffect Policy에 따라 GameplayEffectd 적용
 	UFUNCTION(BlueprintCallable)
 	void OnOverlap(AActor* TargetActor);
 
@@ -61,13 +60,8 @@ protected:
 	void OnEndOverlap(AActor* TargetActor);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
-	bool bDestroyOnEffectRemoval = false;
-
-	// 적용시길 GameplayEffect 클래스, GameplayEffect 기반 블루프린트 생성후 적용예정
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
 	TSubclassOf<UGameplayEffect> InstantGameplayEffectClass;
 
-	// InstantEffect 적용 policy, 기본값 : 미적용
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
 	EEffectApplicationPolicy InstantEffectApplicationPolicy = EEffectApplicationPolicy::DoNotApply;
 
@@ -82,18 +76,19 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
 	EEffectApplicationPolicy InfiniteEffectApplicationPolicy = EEffectApplicationPolicy::DoNotApply;
-	
+	// InfiniteEffect Remove 적용 policy, 오버랩 끝날때로 적용
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
 	EEffectRemovalPolicy InfiniteEffectRemovalPolicy = EEffectRemovalPolicy::RemoveOnEndOverlap;
 
 	// 현재 적용중인 GameplayEffect와 적용대상의 ASC map
 	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectHandles;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AppliedEffects")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+	bool bDestroyOnEffectRemoval = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
 	float ActorLevel = 1.f;
 
 private:
-	
-
 
 };

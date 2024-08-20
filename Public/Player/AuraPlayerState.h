@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Groot
 
 #pragma once
 
@@ -17,7 +17,7 @@ UCLASS()
 class AURA_API AAuraPlayerState : public APlayerState, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
-
+	
 public:
 	AAuraPlayerState();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -27,9 +27,11 @@ public:
 	FORCEINLINE int32 GetPlayerLevel() const { return Level; }
 
 protected:
+	// AuraCharacterBase로부터 상속받은 클래스가 아니므로 따로 선언
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
+	// AuraCharacterBase로부터 상속받은 클래스가 아니므로 따로 선언
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 

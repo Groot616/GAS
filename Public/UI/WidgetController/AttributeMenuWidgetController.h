@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Groot
 
 #pragma once
 
@@ -6,12 +6,13 @@
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "AttributeMenuWidgetController.generated.h"
 
-
 class UAttributeInfo;
+
 struct FAuraAttributeInfo;
 struct FGameplayTag;
 struct FGameplayAttribute;
 
+// Broadcast를 위한 델리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributeInfoSignature, const FAuraAttributeInfo&, Info);
 
 /**
@@ -36,5 +37,4 @@ protected:
 
 private:
 	void BroadcastAttributeInfo(const FGameplayTag& AttributeTag, const FGameplayAttribute& Attribute) const;
-
 };

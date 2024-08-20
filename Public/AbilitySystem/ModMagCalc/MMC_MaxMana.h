@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Groot
 
 #pragma once
 
@@ -17,8 +17,10 @@ class AURA_API UMMC_MaxMana : public UGameplayModMagnitudeCalculation
 public:
 	UMMC_MaxMana();
 
+	// Custom Calculation을 수행하는 함수
 	virtual float CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const override;
 
 private:
+	// 캡쳐할 Attribute를 할당할 함수
 	FGameplayEffectAttributeCaptureDefinition IntDef;
 };

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Groot
 
 #pragma once
 
@@ -11,14 +11,15 @@
 USTRUCT(BlueprintType)
 struct FAuraInputAction
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly)
-	const class UInputAction* InputAction = nullptr;
+    UPROPERTY(EditDefaultsOnly)
+    const class UInputAction* InputAction = nullptr;
 
-	UPROPERTY(EditDefaultsOnly)
-	FGameplayTag InputTag = FGameplayTag();
+    UPROPERTY(EditDefaultsOnly)
+    FGameplayTag InputTag = FGameplayTag();
 };
+
 
 /**
  * 

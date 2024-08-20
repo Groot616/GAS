@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Groot
 
 #pragma once
 
@@ -15,11 +15,11 @@ class AURA_API UAuraUserWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	// WidgetController를 설정하고, WidgetControllerSet()[=BeginPlay()] 를 호출함
+	// WidgetController를 설정하고, WidgetControllerSet()[=BeginPlay()] 를 호출함를 호출하게 됨
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetController(UObject* InWidgetController);
 
-	// View의 value를 변경하기 위한 BlueprintReadOnly
+	// 블루프린트에서 접근할 수 있어야 함
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UObject> WidgetController;
 

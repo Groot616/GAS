@@ -1,18 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Groot
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "GameplayTagContainer.h"
 #include "AuraPlayerController.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
-struct FInputActionValue;
 class IEnemyInterface;
+class UAuraInputConfig;
 class UAuraAbilitySystemComponent;
 class USplineComponent;
+class UDamageTextComponent;
+
+struct FInputActionValue;
+struct FGameplayTag;
 
 /**
  * 
@@ -24,7 +27,13 @@ class AURA_API AAuraPlayerController : public APlayerController
 	
 public:
 	AAuraPlayerController();
-	virtual void Tick(float DeltaTime) override;
+	virtual void PlayerTick(float DeltaTime) override;
+
+	// 서버가 캐릭터 컨트롤시 서버에서 함수를 실행시키고 서버측에서 데미지 보임
+	// 클라이언트가 캐릭터 컨트롤시 서버에서 함수를 실행시키지만 클라이언트측에서 데미지 보임
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -33,7 +42,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> AuraContext;
 
-	// 기존 에지터에서 사용한 mapping과 동일한 역할
+	// 기존 에디터에서 사용한 매핑과 동일한 역할
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> MoveAction;
 
@@ -47,7 +56,7 @@ private:
 	bool bShiftKeyDown = false;
 	void ShiftPressed() { bShiftKeyDown = true; };
 	void ShiftReleased() { bShiftKeyDown = false; };
-	
+
 	void CursorTrace();
 	/**
 	* 기존 포인터 방식이 아닌 TObjectPtr와 유사한 새로운 방식, 캐스팅 필요x
@@ -57,11 +66,10 @@ private:
 	// 틱 변경후 마우스커서가 가리키는 액터
 	TScriptInterface<IEnemyInterface> ThisActor;
 
-	// 키 입력 발생시 실행
+	FHitResult CursorHit;
+
 	void AbilityInputTagPressed(FGameplayTag InputTag);
-	// 키 입력 종료시 실행
 	void AbilityInputTagReleased(FGameplayTag InputTag);
-	// 키 입력 유지시 실행
 	void AbilityInputTagHeld(FGameplayTag InputTag);
 
 	// FAuraInputAction 구조체 사용을 위한 변수
@@ -95,5 +103,6 @@ private:
 	// 클릭 지점 자동 이동
 	void AutoRun();
 
-	FHitResult CursorHit;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
 };

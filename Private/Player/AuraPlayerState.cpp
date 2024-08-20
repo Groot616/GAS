@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Groot
 
 
 #include "Player/AuraPlayerState.h"
@@ -8,28 +8,29 @@
 
 AAuraPlayerState::AAuraPlayerState()
 {
-	AbilitySystemComponent = CreateDefaultSubobject<UAuraAbilitySystemComponent>("AbilitySystemComponent");
-	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+    // AbilitySystemComponent를 상속받은 AuraAbilitySystemComponent 사용
+    AbilitySystemComponent = CreateDefaultSubobject<UAuraAbilitySystemComponent>("AbilitySystemComponent");
+    AbilitySystemComponent->SetIsReplicated(true);
+    AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
-	AttributeSet = CreateDefaultSubobject<UAuraAttributeSet>("AttributeSet");
+    AttributeSet = CreateDefaultSubobject<UAuraAttributeSet>("AttributeSet");
 
+	// 얼마나 자주 서버가 클라이언트를 업데이트할지에 대한 값
 	NetUpdateFrequency = 100.f;
 }
 
 void AAuraPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AAuraPlayerState, Level);
+    DOREPLIFETIME(AAuraPlayerState, Level);
 }
 
 UAbilitySystemComponent* AAuraPlayerState::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent;
+    return AbilitySystemComponent;
 }
 
 void AAuraPlayerState::OnRep_Level(int32 OldLevel)
 {
-
 }

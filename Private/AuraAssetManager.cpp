@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Groot
 
 
 #include "AuraAssetManager.h"
@@ -19,7 +19,8 @@ void UAuraAssetManager::StartInitialLoading()
 	Super::StartInitialLoading();
 
 	FAuraGameplayTags::InitializeNativeGameplayTags();
+
 	// InitTargetDataSriptStructCache 에러 해결
-	// TargetData를 사용하기 위해 필요함
+    // TargetData를 사용하기 위해 필요함
 	UAbilitySystemGlobals::Get().InitGlobalData();
 }

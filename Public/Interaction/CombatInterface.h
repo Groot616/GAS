@@ -1,10 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Groot
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
+
+class UAnimMontage;
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
@@ -23,6 +25,7 @@ class AURA_API ICombatInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual int32 GetPlayerLevel();
+
 	// 파이어볼트 스폰 소켓 위치 리턴
 	virtual FVector GetCombatSocketLocation();
 
